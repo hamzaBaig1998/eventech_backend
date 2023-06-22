@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Event(models.Model):
     name = models.CharField(max_length=255)
@@ -52,16 +53,27 @@ class EventRequest(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
-class AdminUser(models.Model):
-    username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=128)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
-    is_superuser = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
-    last_login = models.DateTimeField(null=True, blank=True)
+# class AdminUser(models.Model):
+#     username = models.CharField(max_length=255, unique=True)
+#     password = models.CharField(max_length=128)
+#     first_name = models.CharField(max_length=255)
+#     last_name = models.CharField(max_length=255)
+#     email = models.EmailField()
+#     is_superuser = models.BooleanField(default=False)
+#     is_staff = models.BooleanField(default=False)
+#     date_joined = models.DateTimeField(default=timezone.now)
+#     last_login = models.DateTimeField(null=True, blank=True)
+
+#     def __str__(self):
+#         return self.username
+
+class AdminUser(User):
+
+    class Meta:
+        proxy = True
+
+    def __str__(self):
+        return self.username
 
 class Poll(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)

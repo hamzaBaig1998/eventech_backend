@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_api_key',
+    'rest_framework.authtoken',
+
     'eventech'
 ]
 
@@ -70,6 +72,10 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 WSGI_APPLICATION = 'eventech_backend.wsgi.application'
 
 
@@ -84,9 +90,11 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    # "DEFAULT_PERMISSION_CLASSES": [
-    #     "rest_framework_api_key.permissions.HasAPIKey",
-    # ]
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # "rest_framework_api_key.permissions.HasAPIKey",
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 # Password validation

@@ -1,4 +1,24 @@
-rrh0dov5.aP51a3WzMwRrsbSIrCrVJePCfhOxjEWy
+Creating API key
 
-Add in header
-Authorization: Api-Key <API_KEY>
+Option 1 (using command):
+    use the following command to generate a key:
+        
+        from rest_framework_api_key.models import APIKey
+        api_key, key = APIKey.objects.create_key(name="my-remote-service")
+
+    the key will be stored in api_key; print(api_key) to view it and save it
+
+Option 2 (using UI):
+    -go to Admin page, there is a "API keys" table under the "API Permission Keys" tab
+    -click on add button
+    -In name put : my-remote-service
+    -API key will be generated
+
+
+
+Adding key in header:
+    Authorization: Api-Key <API_KEY>
+
+
+
+wu5qRGvV.IL6W3uCPzQvDJUXMLU6Ms6VW0STB2Od0
