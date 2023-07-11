@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 
 
-from ..models import Event, AdminUser, Attendee
+from ..models import Event, AdminUser, Attendee, EventRequest
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,3 +26,8 @@ class AttendeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendee
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number')
+
+class EventRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventRequest
+        fields = '__all__'

@@ -1,8 +1,10 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView
-from .views import AdminUserSignUpAPIView, AdminUserSignInAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView
+from .views import TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
+      AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView
+
 
 
 urlpatterns = [
@@ -17,11 +19,15 @@ urlpatterns = [
     path('register-attendee/', RegisterAttendeeView.as_view(), name='register-attendee'),
 
     path('attendees/<int:attendee_id>/events/', AttendeeEventsView.as_view(), name='attendee_events'),
-   path('events/cancel/', CancelEventView.as_view(), name='cancel_event'),
+    path('events/cancel/', CancelEventView.as_view(), name='cancel_event'),
     
     path('admin-signup/', AdminUserSignUpAPIView.as_view(), name='admin-signup'),
     path('admin-signin/', AdminUserSignInAPIView.as_view(), name='admin-signin'),
     path('admin-signout/', AdminUserSignOutAPIView.as_view(), name='admin-signout'),
     path('admin-delete-account/', AdminUserDeleteAccountAPIView.as_view(), name='admin-delete-account'),
+
+    path('event-requests/', EventRequestListCreateAPIView.as_view(), name='event-request-list'),
+    path('event-requests/<int:pk>/', EventRequestRetrieveUpdateDestroyAPIView.as_view(), name='event-request-detail'),
+    path('event-requests/attendee/<int:attendee_id>/', EventRequestListByAttendeeAPIView.as_view(), name='event-request-list-by-attendee'),
 ]
     

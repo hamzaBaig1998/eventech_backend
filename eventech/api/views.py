@@ -13,8 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 
-from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer
-from ..models import Event, AdminUser, Attendee, EventAttendee
+from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer
+from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
 
 
 class TestView(APIView):
@@ -212,3 +212,20 @@ class CancelEventView(APIView):
             return Response({'message': 'Registration cancelled successfully'})
         except EventAttendee.DoesNotExist:
             return Response({'error': 'Event registration not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class EventRequestListCreateAPIView(generics.ListCreateAPIView):
+    queryset = EventRequest.objects.all()
+    serializer_class = EventRequestSerializer
+
+class EventRequestRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = EventRequest.objects.all()
+    serializer_class = EventRequestSerializer
+
+class EventRequestListByAttendeeAPIView(generics.ListAPIView):
+    serializer_class = EventRequestSerializer
+
+    def get_queryset(self):
+        attendee_id = self.kwargs['attendee_id']
+        return EventRequest.objects.filter(Attendee_id=attendee_id)

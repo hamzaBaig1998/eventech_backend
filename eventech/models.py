@@ -42,16 +42,7 @@ class EventAttendee(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
-class EventRequest(models.Model):
-    event_name = models.CharField(max_length=255)
-    event_description = models.TextField()
-    event_date = models.DateTimeField()
-    event_location = models.CharField(max_length=255)
-    requester_name = models.CharField(max_length=255)
-    requester_email = models.EmailField()
-    requester_phone_number = models.CharField(max_length=20)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
+
 
 # class AdminUser(models.Model):
 #     username = models.CharField(max_length=255, unique=True)
@@ -74,6 +65,18 @@ class AdminUser(User):
 
     def __str__(self):
         return self.username
+    
+class EventRequest(models.Model):
+    Attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    Admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE)
+    event_name = models.CharField(max_length=255)
+    event_description = models.TextField()
+    event_location = models.CharField(max_length=255)
+    requester_name = models.CharField(max_length=255)
+    requester_email = models.EmailField()
+    requester_phone_number = models.CharField(max_length=20)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class Poll(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
