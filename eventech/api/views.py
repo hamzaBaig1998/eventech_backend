@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 
-from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer
+from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
 
 
@@ -229,3 +229,14 @@ class EventRequestListByAttendeeAPIView(generics.ListAPIView):
     def get_queryset(self):
         attendee_id = self.kwargs['attendee_id']
         return EventRequest.objects.filter(Attendee_id=attendee_id)
+    
+#Ftech Attendee record
+class AdminAttendeeAPIView(APIView):
+    def get(self, request, admin_id):
+        try:
+            admin = AdminUser.objects.get(id=admin_id)
+        except AdminUser.DoesNotExist:
+            return Response({'error': 'Admin not found'}, status=404)
+
+        admin_serializer = AdminUserSerializer2(admin)
+        return Response(admin_serializer.data)

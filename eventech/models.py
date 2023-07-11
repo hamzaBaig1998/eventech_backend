@@ -2,19 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-class Event(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    location = models.CharField(max_length=255)
-    registration_start_date = models.DateTimeField()
-    registration_end_date = models.DateTimeField()
-    max_attendees = models.PositiveIntegerField()
-    event_image = models.ImageField(upload_to='event_images/', null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-
 class Attendee(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -23,24 +10,6 @@ class Attendee(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
-class EventAttendee(models.Model):
-    TICKET_TYPES = (
-        ('general', 'General'),
-        ('vip', 'VIP'),
-        ('speaker', 'Speaker'),
-    )
-    PAYMENT_STATUSES = (
-        ('paid', 'Paid'),
-        ('pending', 'Pending'),
-        ('cancelled', 'Cancelled'),
-    )
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
-    ticket_type = models.CharField(max_length=50, choices=TICKET_TYPES, default='general')
-    payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUSES, default='pending')
-    payment_amount = models.DecimalField(max_digits=8, decimal_places=2)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
 
 
 
@@ -67,8 +36,8 @@ class AdminUser(User):
         return self.username
     
 class EventRequest(models.Model):
-    Attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
-    Admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE)
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE)
     event_name = models.CharField(max_length=255)
     event_description = models.TextField()
     event_location = models.CharField(max_length=255)
@@ -77,6 +46,40 @@ class EventRequest(models.Model):
     requester_phone_number = models.CharField(max_length=20)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Event(models.Model):
+    admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    location = models.CharField(max_length=255)
+    registration_start_date = models.DateTimeField()
+    registration_end_date = models.DateTimeField()
+    max_attendees = models.PositiveIntegerField()
+    event_image = models.ImageField(upload_to='event_images/', null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class EventAttendee(models.Model):
+    TICKET_TYPES = (
+        ('general', 'General'),
+        ('vip', 'VIP'),
+        ('speaker', 'Speaker'),
+    )
+    PAYMENT_STATUSES = (
+        ('paid', 'Paid'),
+        ('pending', 'Pending'),
+        ('cancelled', 'Cancelled'),
+    )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    ticket_type = models.CharField(max_length=50, choices=TICKET_TYPES, default='general')
+    payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUSES, default='pending')
+    payment_amount = models.DecimalField(max_digits=8, decimal_places=2)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
 class Poll(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
