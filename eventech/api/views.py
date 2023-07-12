@@ -12,11 +12,40 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-
+from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
 
+class AttendeeViewSet(viewsets.ModelViewSet):
+    serializer_class = AttendeeSerializer
+    queryset = Attendee.objects.all()
 
+    def retrieve(self, request, pk=None):
+        attendee = self.get_object()
+
+        # Get all events attended by the attendee
+        attended_events = Event.objects.filter(eventattendee__attendee=attendee, eventattendee__payment_status='paid')
+        attended_events_serializer = EventSerializer(attended_events, many=True)
+
+        # Get all events requested by the attendee
+        requested_events = Event.objects.filter(eventattendee__attendee=attendee, eventattendee__payment_status='pending')
+        requested_events_serializer = EventSerializer(requested_events, many=True)
+
+        # Get all events cancelled by the attendee
+        cancelled_events = Event.objects.filter(eventattendee__attendee=attendee, eventattendee__payment_status='cancelled')
+        cancelled_events_serializer = EventSerializer(cancelled_events, many=True)
+
+        # Serialize the attendee with the attended, requested, and cancelled events
+        attendee_serializer = self.get_serializer(attendee)
+        response_data = {
+            'attendee': attendee_serializer.data,
+            'attended_events': attended_events_serializer.data,
+            'requested_events': requested_events_serializer.data,
+            'cancelled_events': cancelled_events_serializer.data
+        }
+
+        return Response(response_data)
+    
 class TestView(APIView):
 
     def post(self, request):
