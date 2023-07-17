@@ -77,12 +77,12 @@ class AttendeeStatusSerializer(serializers.Serializer):
     pending = serializers.IntegerField()
 
 
-class EventSerializer(serializers.ModelSerializer):
-    attendee_status = AttendeeStatusSerializer(read_only=True)
+# class EventSerializer(serializers.ModelSerializer):
+#     attendee_status = AttendeeStatusSerializer(read_only=True)
 
-    class Meta:
-        model = Event
-        fields = ['id', 'name', 'attendee_status']
+#     class Meta:
+#         model = Event
+#         fields = ['id', 'name', 'attendee_status']
 
 
 class AdminUserSerializer2(serializers.ModelSerializer):
