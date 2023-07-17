@@ -109,7 +109,7 @@ class AdminUserSignInAPIView(APIView):
         if user is not None:
             login(request, user)
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key})
+            return Response({"token": token.key,"user_id":user.id,"username":user.username})
         return Response({"error": "Invalid credentials"}, status=401)
 
 
