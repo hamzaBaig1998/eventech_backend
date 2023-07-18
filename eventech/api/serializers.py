@@ -23,9 +23,23 @@ class AdminUserSerializer(serializers.ModelSerializer):
     
 
 class AttendeeSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
     class Meta:
         model = Attendee
-        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number')
+        fields = '__all__'
+        
+    
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        attendee = Attendee.objects.create_user(**validated_data)
+        attendee.set_password(password)
+        attendee.save()
+        return attendee
+
+# class AttendeeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Attendee
+#         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number')
 
 class EventRequestSerializer(serializers.ModelSerializer):
     class Meta:

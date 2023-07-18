@@ -4,7 +4,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet,\
+        AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -27,6 +28,11 @@ urlpatterns = [
     path('admin-signin/', AdminUserSignInAPIView.as_view(), name='admin-signin'),
     path('admin-signout/', AdminUserSignOutAPIView.as_view(), name='admin-signout'),
     path('admin-delete-account/', AdminUserDeleteAccountAPIView.as_view(), name='admin-delete-account'),
+
+    path('attendee-signup/', AttendeeSignUpAPIView.as_view(), name='attendee-signup'),
+    path('attendee-signin/', AttendeeSignInAPIView.as_view(), name='attendee-signin'),
+    path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
+    path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
     path('event-requests/', EventRequestListCreateAPIView.as_view(), name='event-request-list'),
     path('event-requests/<int:pk>/', EventRequestRetrieveUpdateDestroyAPIView.as_view(), name='event-request-detail'),
