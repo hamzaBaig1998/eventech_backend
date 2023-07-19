@@ -11,6 +11,11 @@ from django.db import models
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import qrcode
+import base64
+from io import BytesIO
 
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
@@ -269,3 +274,21 @@ class AdminAttendeeAPIView(APIView):
 
         admin_serializer = AdminUserSerializer2(admin)
         return Response(admin_serializer.data)
+ 
+@method_decorator(csrf_exempt, name='dispatch')   
+def generate_qrcode(request):
+    if request.method == 'POST':
+        data = request.POST.get('data')
+        img = qrcode.make(data)
+        
+        # Convert the image to a base64-encoded string
+        buffered = BytesIO()
+        img.save(buffered, format='PNG')
+        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        response = {
+            'qrcode': img_str,
+        }
+        return JsonResponse(response)
+    
+    return JsonResponse({'error': 'Invalid request method'})

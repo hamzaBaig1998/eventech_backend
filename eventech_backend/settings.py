@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework_api_key',
     'rest_framework.authtoken',
     'corsheaders',
-    'eventech'
+    'eventech',
+    'qrcode'
 ]
 
 MIDDLEWARE = [
