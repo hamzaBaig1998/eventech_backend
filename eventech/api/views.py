@@ -20,6 +20,7 @@ from io import BytesIO
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
+import json
 
 class AttendeeViewSet(viewsets.ModelViewSet):
     serializer_class = AttendeeSerializer
@@ -278,8 +279,10 @@ class AdminAttendeeAPIView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')   
 def generate_qrcode(request):
     if request.method == 'POST':
-        data = request.POST.get('data')
-        img = qrcode.make(data)
+        data = request.body
+        myData = json.loads(data)
+        print(myData['title'])
+        img = qrcode.make(myData['title'])
         
         # Convert the image to a base64-encoded string
         buffered = BytesIO()
