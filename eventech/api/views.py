@@ -257,7 +257,7 @@ class EventRequestListByAttendeeAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         attendee_id = self.kwargs['attendee_id']
-        return EventRequest.objects.filter(Attendee_id=attendee_id)
+        return EventRequest.objects.filter(attendee_id=attendee_id)
     
 #Ftech Attendee record
 class AdminAttendeeAPIView(APIView):
@@ -269,3 +269,11 @@ class AdminAttendeeAPIView(APIView):
 
         admin_serializer = AdminUserSerializer2(admin)
         return Response(admin_serializer.data)
+    
+
+class AdminUserList(APIView):
+
+    def get(self, request):
+        admins = AdminUser.objects.all()
+        admin_list = [str(admin) for admin in admins]
+        return Response(admin_list)
