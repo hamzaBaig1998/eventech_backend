@@ -9,7 +9,7 @@ from django.urls import path
 
 from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, generate_qrcode
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -38,6 +38,7 @@ urlpatterns = [
     path('event-requests/attendee/<int:attendee_id>/', EventRequestListByAttendeeAPIView.as_view(), name='event-request-list-by-attendee'),
 
     path('admin/<int:admin_id>/attendees/', AdminAttendeeAPIView.as_view(), name='admin-attendees'),
+    path('admin-users/', AdminUserList.as_view()),
     # path('event_images/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 
     path('admin/generate-qrcode/', generate_qrcode, name='generate_qrcode'),

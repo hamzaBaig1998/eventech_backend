@@ -263,7 +263,7 @@ class EventRequestListByAttendeeAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         attendee_id = self.kwargs['attendee_id']
-        return EventRequest.objects.filter(Attendee_id=attendee_id)
+        return EventRequest.objects.filter(attendee_id=attendee_id)
     
 #Ftech Attendee record
 class AdminAttendeeAPIView(APIView):
@@ -275,23 +275,11 @@ class AdminAttendeeAPIView(APIView):
 
         admin_serializer = AdminUserSerializer2(admin)
         return Response(admin_serializer.data)
- 
-@method_decorator(csrf_exempt, name='dispatch')   
-def generate_qrcode(request):
-    if request.method == 'POST':
-        data = request.body
-        myData = json.loads(data)
-        print(myData['title'])
-        img = qrcode.make(myData['title'])
-        
-        # Convert the image to a base64-encoded string
-        buffered = BytesIO()
-        img.save(buffered, format='PNG')
-        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
-        response = {
-            'qrcode': img_str,
-        }
-        return JsonResponse(response)
     
-    return JsonResponse({'error': 'Invalid request method'})
+
+class AdminUserList(APIView):
+
+    def get(self, request):
+        admins = AdminUser.objects.all()
+        admin_list = [str(admin) for admin in admins]
+        return Response(admin_list)
