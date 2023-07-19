@@ -41,7 +41,7 @@ urlpatterns = [
     path('admin-users/', AdminUserList.as_view()),
     # path('event_images/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 
-    path('admin/generate-qrcode/', generate_qrcode, name='generate_qrcode'),
+    # path('admin/generate-qrcode/', generate_qrcode, name='generate_qrcode'),
 
     path('', include(router.urls)),
 ]
