@@ -79,6 +79,7 @@ class EventAttendee(models.Model):
     payment_amount = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    attended = models.BooleanField(default=False)
 
 
 class Poll(models.Model):
