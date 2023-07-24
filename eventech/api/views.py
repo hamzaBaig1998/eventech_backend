@@ -11,10 +11,16 @@ from django.db import models
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import qrcode
+import base64
+from io import BytesIO
 
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
+import json
 
 class AttendeeViewSet(viewsets.ModelViewSet):
     serializer_class = AttendeeSerializer
@@ -317,3 +323,17 @@ class AdminUserList(APIView):
         admins = AdminUser.objects.all()
         admin_list = [str(admin) for admin in admins]
         return Response(admin_list)
+    
+@method_decorator(csrf_exempt, name='dispatch') 
+class UpdateAttendedStatus(APIView):
+
+    def put(self, request, user_id, event_id):
+        try:
+            attendee = EventAttendee.objects.get(attendee__id=user_id, event__id=event_id)
+            attendee.attended = True
+            attendee.save()
+            return Response({'message': 'Attended status updated successfully.'}, status=status.HTTP_200_OK)
+        except EventAttendee.DoesNotExist:
+            return Response({'error': 'EventAttendee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
