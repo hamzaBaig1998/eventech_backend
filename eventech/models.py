@@ -2,16 +2,22 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-class Attendee(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
+# class Attendee(models.Model):
+#     first_name = models.CharField(max_length=255)
+#     last_name = models.CharField(max_length=255)
+#     email = models.EmailField()
+#     phone_number = models.CharField(max_length=20)
+#     created_at = models.DateTimeField(default=timezone.now)
+#     updated_at = models.DateTimeField(auto_now=True)
+
+class Attendee(User):
     phone_number = models.CharField(max_length=20)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
 
-
-
+    def __str__(self):
+        return self.username
+    
+    class Meta:
+        verbose_name = "Attendee"
 
 # class AdminUser(models.Model):
 #     username = models.CharField(max_length=255, unique=True)
@@ -36,8 +42,8 @@ class AdminUser(User):
         return self.username
     
 class EventRequest(models.Model):
-    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
-    admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE)
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE, related_name='attendee_requests')
+    admin = models.ForeignKey(AdminUser, on_delete=models.CASCADE, related_name='admin_requests')
     event_name = models.CharField(max_length=255)
     event_description = models.TextField()
     event_location = models.CharField(max_length=255)

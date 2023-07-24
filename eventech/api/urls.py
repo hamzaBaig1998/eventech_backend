@@ -1,13 +1,11 @@
 from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
-from django.views.static import serve
-from django.conf import settings
-from django.conf.urls.static import static
 
 from .views import TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet,\
+        AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -31,14 +29,16 @@ urlpatterns = [
     path('admin-signout/', AdminUserSignOutAPIView.as_view(), name='admin-signout'),
     path('admin-delete-account/', AdminUserDeleteAccountAPIView.as_view(), name='admin-delete-account'),
 
+    path('attendee-signup/', AttendeeSignUpAPIView.as_view(), name='attendee-signup'),
+    path('attendee-signin/', AttendeeSignInAPIView.as_view(), name='attendee-signin'),
+    path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
+    path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
+
     path('event-requests/', EventRequestListCreateAPIView.as_view(), name='event-request-list'),
     path('event-requests/<int:pk>/', EventRequestRetrieveUpdateDestroyAPIView.as_view(), name='event-request-detail'),
     path('event-requests/attendee/<int:attendee_id>/', EventRequestListByAttendeeAPIView.as_view(), name='event-request-list-by-attendee'),
 
     path('admin/<int:admin_id>/attendees/', AdminAttendeeAPIView.as_view(), name='admin-attendees'),
-    path('admin-users/', AdminUserList.as_view()),
-    # path('event_images/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 
     path('', include(router.urls)),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

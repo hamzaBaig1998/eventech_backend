@@ -89,7 +89,6 @@ class EventRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #             return Response({"message": "User created successfully"})
 #         return Response(serializer.errors)
 
-
 class AdminUserSignUpAPIView(APIView):
     def post(self, request):
         serializer = AdminUserSerializer(data=request.data)
@@ -129,6 +128,47 @@ class AdminUserDeleteAccountAPIView(APIView):
         user.delete()
         return Response({"message": "Account deleted"})
     
+#Attendee Sign in Sign up APIs
+class AttendeeSignUpAPIView(APIView):
+    def post(self, request):
+        serializer = AttendeeSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            if User.objects.filter(email=email).exists():
+                return Response({"message": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            user = serializer.save()
+            return Response({"message": "User created successfully"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AttendeeSignInAPIView(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key,"user_id":user.id,"username":user.username})
+        return Response({"error": "Invalid credentials"}, status=401)
+
+
+class AttendeeSignOutAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Successfully logged out"})
+
+
+class AttendeeDeleteAccountAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "Account deleted"})
+
+###    
 
 class RegisterEventView(APIView):
     def post(self, request):
