@@ -9,7 +9,7 @@ from django.urls import path
 
 from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -42,6 +42,11 @@ urlpatterns = [
     # path('event_images/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 
     path('admin/update_attended_status_backend/<int:user_id>/<int:event_id>', UpdateAttendedStatus.as_view() , name='update_attended_status'),
+
+    path('attendee-signup/', AttendeeSignUpAPIView.as_view(), name='attendee-signup'),
+    path('attendee-signin/', AttendeeSignInAPIView.as_view(), name='attendee-signin'),
+    path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
+    path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
     path('', include(router.urls)),
 ]
