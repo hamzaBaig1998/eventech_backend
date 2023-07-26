@@ -305,6 +305,13 @@ class EventRequestListByAttendeeAPIView(generics.ListAPIView):
     def get_queryset(self):
         attendee_id = self.kwargs['attendee_id']
         return EventRequest.objects.filter(attendee_id=attendee_id)
+
+class EventRequestListByAdminAPIView(generics.ListAPIView):
+    serializer_class = EventRequestSerializer
+
+    def get_queryset(self):
+        admin_id = self.kwargs['admin_id']
+        return EventRequest.objects.filter(admin_id=admin_id)
     
 #Ftech Attendee record
 class AdminAttendeeAPIView(APIView):

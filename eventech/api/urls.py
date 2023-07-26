@@ -13,7 +13,7 @@ from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroy
         EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, \
         EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, \
         UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, \
-        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList
+        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList, EventRequestListByAdminAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -40,6 +40,7 @@ urlpatterns = [
     path('event-requests/', EventRequestListCreateAPIView.as_view(), name='event-request-list'),
     path('event-requests/<int:pk>/', EventRequestRetrieveUpdateDestroyAPIView.as_view(), name='event-request-detail'),
     path('event-requests/attendee/<int:attendee_id>/', EventRequestListByAttendeeAPIView.as_view(), name='event-request-list-by-attendee'),
+    path('event-requests/admin/<int:admin_id>/',EventRequestListByAdminAPIView.as_view(),name="event-request-list-by-admin"),
 
     path('admin/<int:admin_id>/attendees/', AdminAttendeeAPIView.as_view(), name='admin-attendees'),
     path('admin-users/', AdminUserList.as_view()),

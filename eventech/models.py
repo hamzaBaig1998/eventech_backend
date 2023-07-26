@@ -113,3 +113,13 @@ class Feedback(models.Model):
     feedback_text = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class Chat(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_chats')
+    sender = models.ForeignKey(Attendee, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
