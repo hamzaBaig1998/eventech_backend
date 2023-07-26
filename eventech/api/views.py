@@ -329,7 +329,7 @@ class AdminUserList(APIView):
 
     def get(self, request):
         admins = AdminUser.objects.all()
-        admin_list = [{admin.id: admin.username} for admin in admins]
+        admin_list = [{"id":admin.id,"username": admin.username} for admin in admins]
         return Response(admin_list)
     
 @method_decorator(csrf_exempt, name='dispatch') 
@@ -348,8 +348,8 @@ class UpdateAttendedStatus(APIView):
         
 
 class EventAttendeeList(APIView):
-    def get(self, request):
-        events = Event.objects.all()
+    def get(self, request,admin_id):
+        events = Event.objects.filter(admin_id=admin_id)
         event_attendees = []
         for event in events:
             attendees = EventAttendee.objects.filter(event=event)
@@ -399,14 +399,14 @@ class FeedbackList(APIView):
             feedback_dict = {
                 'id': feedback.id,
                 'event_id': feedback.event.id,
-                'attendee_id': feedback.attendee.id,
+                'attendee_name': feedback.attendee.username,
                 'rating': feedback.rating,
                 'feedback_text': feedback.feedback_text,
                 'created_at': feedback.created_at,
                 'updated_at': feedback.updated_at
             }
             feedback_data.append(feedback_dict)
-        return JsonResponse(feedback_data, safe=False)
+        return JsonResponse({"event_name":event.name,"feedbacks":feedback_data}, safe=False)
 
     def post(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)

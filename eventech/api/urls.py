@@ -54,7 +54,7 @@ urlpatterns = [
     path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
     # 26th July 2023
-    path('events-attendees/', EventAttendeeList.as_view(), name='event-attendee-list'),
+    path('events-attendees/<int:admin_id>', EventAttendeeList.as_view(), name='event-attendee-list'),
     path('events/<int:event_id>/feedbacks/', FeedbackList.as_view(), name='feedback-list'),
     path('events/<int:event_id>/feedbacks/<int:feedback_id>/', FeedbackList.as_view(), name='feedback-detail'),
     path('admin-list/', AdminUserList.as_view(), name='admin-list'),
