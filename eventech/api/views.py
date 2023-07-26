@@ -11,10 +11,16 @@ from django.db import models
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import qrcode
+import base64
+from io import BytesIO
 
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
+import json
 
 class AttendeeViewSet(viewsets.ModelViewSet):
     serializer_class = AttendeeSerializer
@@ -89,7 +95,6 @@ class EventRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #             return Response({"message": "User created successfully"})
 #         return Response(serializer.errors)
 
-
 class AdminUserSignUpAPIView(APIView):
     def post(self, request):
         serializer = AdminUserSerializer(data=request.data)
@@ -129,6 +134,47 @@ class AdminUserDeleteAccountAPIView(APIView):
         user.delete()
         return Response({"message": "Account deleted"})
     
+#Attendee Sign in Sign up APIs
+class AttendeeSignUpAPIView(APIView):
+    def post(self, request):
+        serializer = AttendeeSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            if User.objects.filter(email=email).exists():
+                return Response({"message": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            user = serializer.save()
+            return Response({"message": "User created successfully"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AttendeeSignInAPIView(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key,"user_id":user.id,"username":user.username})
+        return Response({"error": "Invalid credentials"}, status=401)
+
+
+class AttendeeSignOutAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Successfully logged out"})
+
+
+class AttendeeDeleteAccountAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "Account deleted"})
+
+###    
 
 class RegisterEventView(APIView):
     def post(self, request):
@@ -277,3 +323,17 @@ class AdminUserList(APIView):
         admins = AdminUser.objects.all()
         admin_list = [str(admin) for admin in admins]
         return Response(admin_list)
+    
+@method_decorator(csrf_exempt, name='dispatch') 
+class UpdateAttendedStatus(APIView):
+
+    def put(self, request, user_id, event_id):
+        try:
+            attendee = EventAttendee.objects.get(attendee__id=user_id, event__id=event_id)
+            attendee.attended = True
+            attendee.save()
+            return Response({'message': 'Attended status updated successfully.'}, status=status.HTTP_200_OK)
+        except EventAttendee.DoesNotExist:
+            return Response({'error': 'EventAttendee not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

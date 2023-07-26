@@ -4,10 +4,12 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path
 
-from .views import TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
+
+from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -38,6 +40,13 @@ urlpatterns = [
     path('admin/<int:admin_id>/attendees/', AdminAttendeeAPIView.as_view(), name='admin-attendees'),
     path('admin-users/', AdminUserList.as_view()),
     # path('event_images/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+
+    path('admin/update_attended_status_backend/<int:user_id>/<int:event_id>', UpdateAttendedStatus.as_view() , name='update_attended_status'),
+
+    path('attendee-signup/', AttendeeSignUpAPIView.as_view(), name='attendee-signup'),
+    path('attendee-signin/', AttendeeSignInAPIView.as_view(), name='attendee-signin'),
+    path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
+    path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
     path('', include(router.urls)),
 ]
