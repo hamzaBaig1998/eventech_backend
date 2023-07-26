@@ -12,14 +12,15 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import qrcode
 import base64
 from io import BytesIO
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
-from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
+from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest, Feedback
 import json
 
 class AttendeeViewSet(viewsets.ModelViewSet):
@@ -321,7 +322,7 @@ class AdminUserList(APIView):
 
     def get(self, request):
         admins = AdminUser.objects.all()
-        admin_list = [str(admin) for admin in admins]
+        admin_list = [{admin.id: admin.username} for admin in admins]
         return Response(admin_list)
     
 @method_decorator(csrf_exempt, name='dispatch') 
@@ -377,3 +378,53 @@ class EventAttendeeList(APIView):
             }
             event_attendees.append(event_dict)
         return Response(event_attendees)
+    
+
+
+# @method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class FeedbackList(APIView):
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        feedbacks = Feedback.objects.filter(event=event)
+        feedback_data = []
+        for feedback in feedbacks:
+            feedback_dict = {
+                'id': feedback.id,
+                'event_id': feedback.event.id,
+                'attendee_id': feedback.attendee.id,
+                'rating': feedback.rating,
+                'feedback_text': feedback.feedback_text,
+                'created_at': feedback.created_at,
+                'updated_at': feedback.updated_at
+            }
+            feedback_data.append(feedback_dict)
+        return JsonResponse(feedback_data, safe=False)
+
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        # attendee = request.user.attendee
+        data = json.loads(request.body)
+        rating = data.get('rating')
+        attendee = get_object_or_404(Attendee, id=data.get('attendee'))
+        feedback_text = data.get('feedback_text')
+        if Feedback.objects.filter(attendee=attendee,event=event):
+            return JsonResponse({'error': 'You have already submitted your feedback'}, status=400)
+        if rating is None or feedback_text is None:
+            return JsonResponse({'error': 'Both rating and feedback_text are required.'}, status=400)
+        feedback = Feedback.objects.create(event=event, attendee=attendee, rating=rating, feedback_text=feedback_text)
+        feedback_dict = {
+            'id': feedback.id,
+            'event_id': feedback.event.id,
+            'attendee_id': feedback.attendee.id,
+            'rating': feedback.rating,
+            'feedback_text': feedback.feedback_text,
+            'created_at': feedback.created_at,
+            'updated_at': feedback.updated_at
+        }
+        return JsonResponse(feedback_dict, status=201)
+
+    def delete(self, request, event_id, feedback_id):
+        feedback = get_object_or_404(Feedback, id=feedback_id, event_id=event_id)
+        feedback.delete()
+        return JsonResponse({'message': 'Feedback deleted successfully.'}, status=204)

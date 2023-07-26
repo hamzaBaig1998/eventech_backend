@@ -7,9 +7,13 @@ from django.conf.urls.static import static
 from django.urls import path
 
 
-from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
-      AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView, EventAttendeeList
+from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, \
+        SwapEventView, DeleteEventView,AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, \
+        AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, \
+        EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, \
+        UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, \
+        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -48,8 +52,12 @@ urlpatterns = [
     path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
     path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
+    # 26th July 2023
     path('events-attendees/', EventAttendeeList.as_view(), name='event-attendee-list'),
-
+    path('events/<int:event_id>/feedbacks/', FeedbackList.as_view(), name='feedback-list'),
+    path('events/<int:event_id>/feedbacks/<int:feedback_id>/', FeedbackList.as_view(), name='feedback-detail'),
+    path('admin-list/', AdminUserList.as_view(), name='admin-list'),
+    
     path('', include(router.urls)),
     
 ]
