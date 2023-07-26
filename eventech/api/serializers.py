@@ -122,6 +122,6 @@ class AdminUserSerializer2(serializers.ModelSerializer):
                 elif attendee.payment_status == 'pending':
                     attendee_status['pending'] += 1
 
-            event['attendee_status'] = attendee_status
+            # event['attendee_status'] = attendee_status
 
         return event_data
