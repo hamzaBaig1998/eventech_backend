@@ -22,6 +22,7 @@ from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
 from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest, Feedback
 import json
+from django.db.models import Sum, Case, When, IntegerField
 
 class AttendeeViewSet(viewsets.ModelViewSet):
     serializer_class = AttendeeSerializer
@@ -332,7 +333,7 @@ class AdminUserList(APIView):
         admin_list = [{"id":admin.id,"username": admin.username} for admin in admins]
         return Response(admin_list)
     
-@method_decorator(csrf_exempt, name='dispatch') 
+# @method_decorator(csrf_exempt, name='dispatch') 
 class UpdateAttendedStatus(APIView):
 
     def put(self, request, user_id, event_id):
@@ -435,3 +436,28 @@ class FeedbackList(APIView):
         feedback = get_object_or_404(Feedback, id=feedback_id, event_id=event_id)
         feedback.delete()
         return JsonResponse({'message': 'Feedback deleted successfully.'}, status=204)
+    
+class attendees_count(APIView):
+    def get(self,request):
+        try:
+            events = Event.objects.all()
+            result = []
+
+            for event in events:
+                attendees_info = EventAttendee.objects.filter(event=event).aggregate(
+                    total_attendees=Sum(1),
+                    total_attended=Sum(Case(When(attended=True, then=1), default=0, output_field=IntegerField()))
+                )
+
+                event_info = {
+                    "event_name": event.name,
+                    "registered": attendees_info['total_attendees'],
+                    "attended": attendees_info['total_attended'],
+                }
+                result.append(event_info)
+
+            return JsonResponse({"events": result})
+
+
+        except Event.DoesNotExist:
+            return JsonResponse({"error": "Event not found."})
