@@ -12,14 +12,15 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import qrcode
 import base64
 from io import BytesIO
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import viewsets
 from .serializers import EventSerializer, AdminUserSerializer,AttendeeSerializer, EventRequestSerializer, AdminUserSerializer2
-from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest
+from ..models import Event, AdminUser, Attendee, EventAttendee, EventRequest, Feedback
 import json
 
 class AttendeeViewSet(viewsets.ModelViewSet):
@@ -304,6 +305,13 @@ class EventRequestListByAttendeeAPIView(generics.ListAPIView):
     def get_queryset(self):
         attendee_id = self.kwargs['attendee_id']
         return EventRequest.objects.filter(attendee_id=attendee_id)
+
+class EventRequestListByAdminAPIView(generics.ListAPIView):
+    serializer_class = EventRequestSerializer
+
+    def get_queryset(self):
+        admin_id = self.kwargs['admin_id']
+        return EventRequest.objects.filter(admin_id=admin_id)
     
 #Ftech Attendee record
 class AdminAttendeeAPIView(APIView):
@@ -321,7 +329,7 @@ class AdminUserList(APIView):
 
     def get(self, request):
         admins = AdminUser.objects.all()
-        admin_list = [str(admin) for admin in admins]
+        admin_list = [{"id":admin.id,"username": admin.username} for admin in admins]
         return Response(admin_list)
     
 @method_decorator(csrf_exempt, name='dispatch') 
@@ -337,3 +345,93 @@ class UpdateAttendedStatus(APIView):
             return Response({'error': 'EventAttendee not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class EventAttendeeList(APIView):
+    def get(self, request,admin_id):
+        events = Event.objects.filter(admin_id=admin_id)
+        event_attendees = []
+        for event in events:
+            attendees = EventAttendee.objects.filter(event=event)
+            attendee_list = []
+            for attendee in attendees:
+                attendee_dict = {
+                    'id': attendee.id,
+                    'attendee': {
+                        'id': attendee.attendee.id,
+                        'username': attendee.attendee.username,
+                        'first_name': attendee.attendee.first_name,
+                        'last_name': attendee.attendee.last_name,
+                        'email': attendee.attendee.email,
+                        'phone_number': attendee.attendee.phone_number
+                    },
+                    'ticket_type': attendee.ticket_type,
+                    'payment_status': attendee.payment_status,
+                    'attended': attendee.attended
+                }
+                attendee_list.append(attendee_dict)
+            event_dict = {
+                'id': event.id,
+                'name': event.name,
+                'description': event.description,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'location': event.location,
+                'registration_start_date': event.registration_start_date,
+                'registration_end_date': event.registration_end_date,
+                'max_attendees': event.max_attendees,
+                'event_image': event.event_image.url if event.event_image else None,
+                'attendees': attendee_list
+            }
+            event_attendees.append(event_dict)
+        return Response(event_attendees)
+    
+
+
+# @method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class FeedbackList(APIView):
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        feedbacks = Feedback.objects.filter(event=event)
+        feedback_data = []
+        for feedback in feedbacks:
+            feedback_dict = {
+                'id': feedback.id,
+                'event_id': feedback.event.id,
+                'attendee_name': feedback.attendee.username,
+                'rating': feedback.rating,
+                'feedback_text': feedback.feedback_text,
+                'created_at': feedback.created_at,
+                'updated_at': feedback.updated_at
+            }
+            feedback_data.append(feedback_dict)
+        return JsonResponse({"event_name":event.name,"feedbacks":feedback_data}, safe=False)
+
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        # attendee = request.user.attendee
+        data = json.loads(request.body)
+        rating = data.get('rating')
+        attendee = get_object_or_404(Attendee, id=data.get('attendee'))
+        feedback_text = data.get('feedback_text')
+        if Feedback.objects.filter(attendee=attendee,event=event):
+            return JsonResponse({'error': 'You have already submitted your feedback'}, status=400)
+        if rating is None or feedback_text is None:
+            return JsonResponse({'error': 'Both rating and feedback_text are required.'}, status=400)
+        feedback = Feedback.objects.create(event=event, attendee=attendee, rating=rating, feedback_text=feedback_text)
+        feedback_dict = {
+            'id': feedback.id,
+            'event_id': feedback.event.id,
+            'attendee_id': feedback.attendee.id,
+            'rating': feedback.rating,
+            'feedback_text': feedback.feedback_text,
+            'created_at': feedback.created_at,
+            'updated_at': feedback.updated_at
+        }
+        return JsonResponse(feedback_dict, status=201)
+
+    def delete(self, request, event_id, feedback_id):
+        feedback = get_object_or_404(Feedback, id=feedback_id, event_id=event_id)
+        feedback.delete()
+        return JsonResponse({'message': 'Feedback deleted successfully.'}, status=204)

@@ -7,9 +7,13 @@ from django.conf.urls.static import static
 from django.urls import path
 
 
-from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
-      AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
+from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, \
+        SwapEventView, DeleteEventView,AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, \
+        AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, \
+        EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, \
+        UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, \
+        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList, EventRequestListByAdminAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -36,6 +40,7 @@ urlpatterns = [
     path('event-requests/', EventRequestListCreateAPIView.as_view(), name='event-request-list'),
     path('event-requests/<int:pk>/', EventRequestRetrieveUpdateDestroyAPIView.as_view(), name='event-request-detail'),
     path('event-requests/attendee/<int:attendee_id>/', EventRequestListByAttendeeAPIView.as_view(), name='event-request-list-by-attendee'),
+    path('event-requests/admin/<int:admin_id>/',EventRequestListByAdminAPIView.as_view(),name="event-request-list-by-admin"),
 
     path('admin/<int:admin_id>/attendees/', AdminAttendeeAPIView.as_view(), name='admin-attendees'),
     path('admin-users/', AdminUserList.as_view()),
@@ -48,6 +53,13 @@ urlpatterns = [
     path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
     path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
+    # 26th July 2023
+    path('events-attendees/<int:admin_id>', EventAttendeeList.as_view(), name='event-attendee-list'),
+    path('events/<int:event_id>/feedbacks/', FeedbackList.as_view(), name='feedback-list'),
+    path('events/<int:event_id>/feedbacks/<int:feedback_id>/', FeedbackList.as_view(), name='feedback-detail'),
+    path('admin-list/', AdminUserList.as_view(), name='admin-list'),
+    
     path('', include(router.urls)),
+    
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
