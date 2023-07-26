@@ -1,4 +1,3 @@
-from django import views
 from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
@@ -14,7 +13,7 @@ from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroy
         EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, \
         EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, \
         UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, \
-        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList, EventRequestListByAdminAPIView, attendees_count
+        AttendeeDeleteAccountAPIView, EventAttendeeList, FeedbackList, EventRequestListByAdminAPIView
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -59,8 +58,6 @@ urlpatterns = [
     path('events/<int:event_id>/feedbacks/', FeedbackList.as_view(), name='feedback-list'),
     path('events/<int:event_id>/feedbacks/<int:feedback_id>/', FeedbackList.as_view(), name='feedback-detail'),
     path('admin-list/', AdminUserList.as_view(), name='admin-list'),
-
-    path('event/attendees_count/', attendees_count.as_view(), name='registered_attendees_count'),
     
     path('', include(router.urls)),
     
