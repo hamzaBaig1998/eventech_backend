@@ -9,7 +9,7 @@ from django.urls import path
 
 from .views import  TestView, EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView, RegisterEventView, SwapEventView, DeleteEventView,\
       AdminUserSignInAPIView, AdminUserSignUpAPIView, AdminUserSignOutAPIView, AdminUserDeleteAccountAPIView, RegisterAttendeeView, AttendeeEventsView, CancelEventView,\
-        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView
+        EventRequestListCreateAPIView, EventRequestRetrieveUpdateDestroyAPIView, EventRequestListByAttendeeAPIView, AdminAttendeeAPIView, AttendeeViewSet, AdminUserList, UpdateAttendedStatus,  AttendeeSignUpAPIView, AttendeeSignInAPIView, AttendeeSignOutAPIView, AttendeeDeleteAccountAPIView, EventAttendeeList
 
 router = routers.DefaultRouter()
 router.register(r'attendees', AttendeeViewSet, basename='attendees')
@@ -48,6 +48,9 @@ urlpatterns = [
     path('attendee-signout/', AttendeeSignOutAPIView.as_view(), name='attendee-signout'),
     path('attendee-delete-account/', AttendeeDeleteAccountAPIView.as_view(), name='attendee-delete-account'),
 
+    path('events-attendees/', EventAttendeeList.as_view(), name='event-attendee-list'),
+
     path('', include(router.urls)),
+    
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

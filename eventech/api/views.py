@@ -337,3 +337,43 @@ class UpdateAttendedStatus(APIView):
             return Response({'error': 'EventAttendee not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class EventAttendeeList(APIView):
+    def get(self, request):
+        events = Event.objects.all()
+        event_attendees = []
+        for event in events:
+            attendees = EventAttendee.objects.filter(event=event)
+            attendee_list = []
+            for attendee in attendees:
+                attendee_dict = {
+                    'id': attendee.id,
+                    'attendee': {
+                        'id': attendee.attendee.id,
+                        'username': attendee.attendee.username,
+                        'first_name': attendee.attendee.first_name,
+                        'last_name': attendee.attendee.last_name,
+                        'email': attendee.attendee.email,
+                        'phone_number': attendee.attendee.phone_number
+                    },
+                    'ticket_type': attendee.ticket_type,
+                    'payment_status': attendee.payment_status,
+                    'attended': attendee.attended
+                }
+                attendee_list.append(attendee_dict)
+            event_dict = {
+                'id': event.id,
+                'name': event.name,
+                'description': event.description,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'location': event.location,
+                'registration_start_date': event.registration_start_date,
+                'registration_end_date': event.registration_end_date,
+                'max_attendees': event.max_attendees,
+                'event_image': event.event_image.url if event.event_image else None,
+                'attendees': attendee_list
+            }
+            event_attendees.append(event_dict)
+        return Response(event_attendees)
