@@ -63,6 +63,7 @@ class Event(models.Model):
     registration_start_date = models.DateTimeField()
     registration_end_date = models.DateTimeField()
     max_attendees = models.PositiveIntegerField()
+    is_active=models.BooleanField(default=False)
     event_image = models.ImageField(upload_to='event_images/', null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
